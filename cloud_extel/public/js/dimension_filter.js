@@ -11,11 +11,13 @@ doctypes_with_dimensions.forEach((doctype) => {
 			frappe.call({
 				'method': 'frappe.client.get_list',
 				'args': {
-					'filters':{'business_segment': frm.doc.cost_center},
-					'doctype': 'Business Segment',
-					'fields': ['parent'],
-					'parent': 'Telecom Region'
-				},
+					'filters':{
+						'business_segment': frm.doc.cost_center},
+						'doctype': 'Business Segment',
+						'fields': ['parent'],
+						'parent': 'Telecom Region',
+						'limit_page_length': 300
+					},
 				'callback': function(r) {
 					frm.set_query('telecom_region', function() {
 						let region_list = r.message;
