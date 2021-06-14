@@ -84,7 +84,8 @@ def post_tds_gl_entries(payment_entry, method):
 
 					booked_invoices.append(invoice.reference_name)
 
-					make_gl_entries(gl_entries)
+					if gl_entries:
+						make_gl_entries(gl_entries)
 
 def reverse_provision_entry(doc, method):
 	gl_entries = []
