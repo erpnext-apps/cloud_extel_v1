@@ -19,10 +19,9 @@ def post_tds_gl_entries(payment_entry, method):
 				if invoice.reference_name not in booked_invoices:
 					doc = frappe.get_doc('Sales Invoice', invoice.reference_name)
 					for item in doc.get('items'):
-						service_start_date = getdate(item.start_date)
-						service_end_date = getdate(item.end_date)
-
-						if service_start_date and service_end_date:
+						if item.start_date and item.end_date:
+							service_start_date = getdate(item.start_date)
+							service_end_date = getdate(item.end_date)
 							no_of_months = (service_end_date.year - service_start_date.year) * 12 + \
 								(service_end_date.month - service_start_date.month) + 1
 
