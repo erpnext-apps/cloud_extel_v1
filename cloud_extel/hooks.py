@@ -83,10 +83,10 @@ app_include_js = "/assets/cloud_extel/js/cloud_extel.js"
 # ---------------
 # Hook on document methods and events
 
-doc_events = {
-	"Payment Entry": {
-		"on_submit": "cloud_extel.cloud_extel.deferred_tds.post_tds_gl_entries",
-	},
+#doc_events = {
+	# "Payment Entry": {
+	# 	"on_submit": "cloud_extel.cloud_extel.deferred_tds.post_tds_gl_entries",
+	# },
 	# "Delivery Note": {
 	# 	"on_submit": "cloud_extel.cloud_extel.deferred_tds.make_gl_entries_on_dn_submit"
 	# },
@@ -96,12 +96,12 @@ doc_events = {
 	# "Journal Entry": {
 	# 	"on_submit": "cloud_extel.cloud_extel.deferred_tds.book_ltds"
 	# }
-}
+#}
 
 # Scheduled Tasks
 # ---------------
 
-scheduler_events = {
+#scheduler_events = {
 	# "all": [
 	# 	"cloud_extel.tasks.all"
 	# ],
@@ -114,9 +114,9 @@ scheduler_events = {
 	# "weekly": [
 	# 	"cloud_extel.tasks.weekly"
 	# ]
-	"monthly": [
-		"cloud_extel.cloud_extel.deferred_tds.post_delivery_note_entries"
-	]
+	# "monthly": [
+	# 	"cloud_extel.cloud_extel.deferred_tds.post_delivery_note_entries"
+	# ]
 }
 
 # Testing
