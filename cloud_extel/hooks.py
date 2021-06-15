@@ -117,7 +117,7 @@ app_include_js = "/assets/cloud_extel/js/cloud_extel.js"
 	# "monthly": [
 	# 	"cloud_extel.cloud_extel.deferred_tds.post_delivery_note_entries"
 	# ]
-}
+#}
 
 # Testing
 # -------
