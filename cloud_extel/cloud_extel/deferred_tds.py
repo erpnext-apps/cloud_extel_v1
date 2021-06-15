@@ -45,6 +45,8 @@ def post_tds_gl_entries(payment_entry, method):
 										"debit": amount,
 										"debit_in_account_currency": amount,
 										"cost_center": item.cost_center
+										"party_type": payment_entry.party_type,
+										"party": payment_entry.party
 									}, payment_entry.party_account_currency, item=item)
 								)
 
@@ -54,7 +56,9 @@ def post_tds_gl_entries(payment_entry, method):
 										"against": payment_entry.party,
 										"credit": amount,
 										"credit_in_account_currency": amount,
-										"cost_center": item.cost_center
+										"cost_center": item.cost_center,
+										"party_type": payment_entry.party_type,
+										"party": payment_entry.party
 									}, payment_entry.party_account_currency, item=item)
 								)
 						else:
@@ -68,7 +72,9 @@ def post_tds_gl_entries(payment_entry, method):
 									"against": payment_entry.party,
 									"debit": amount,
 									"debit_in_account_currency": amount,
-									"cost_center": item.cost_center
+									"cost_center": item.cost_center,
+									"party_type": payment_entry.party_type,
+									"party": payment_entry.party
 								}, payment_entry.party_account_currency, item=item)
 							)
 
@@ -78,7 +84,9 @@ def post_tds_gl_entries(payment_entry, method):
 									"against": payment_entry.party,
 									"credit": amount,
 									"credit_in_account_currency": amount,
-									"cost_center": item.cost_center
+									"cost_center": item.cost_center,
+									"party_type": payment_entry.party_type,
+									"party": payment_entry.party
 								}, payment_entry.party_account_currency, item=item)
 							)
 
