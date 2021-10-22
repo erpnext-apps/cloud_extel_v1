@@ -49,6 +49,5 @@ def get_expense_account_map(purchase_document):
 		if d.get('purchase_receipt'):
 			purchase_receipts.append(d.purchase_receipt)
 	
-		fields=['name', 'expense_account'], as_list=1))
 	return frappe._dict(frappe.get_all('Purchase Receipt Item', filters={'parent': ('in', purchase_receipts)},
 		fields=['name', 'expense_account'], as_list=1))
