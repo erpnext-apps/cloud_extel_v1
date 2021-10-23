@@ -21,8 +21,8 @@ def make_purchase_invoice_gl_entries(doc, method):
 					'account':service_received_but_not_billed_account}, ['name'], as_dict=1)
 
 				if expense_booked_in_pr:
-					account_currency = get_account_currency(expense_booked_in_pr.account)
 					expense_account = expense_account_map.get(item.pr_detail)
+					account_currency = get_account_currency(expense_account)
 					amount = flt(item.base_net_amount + item.item_tax_amount, item.precision("base_net_amount"))
 					gl_entries.append(doc.get_gl_dict({
 						"account": expense_account,
