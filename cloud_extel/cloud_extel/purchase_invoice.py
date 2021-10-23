@@ -15,7 +15,6 @@ def make_purchase_invoice_gl_entries(doc, method):
 
 		for item in doc.get("items"):
 			if item.purchase_receipt:
-				# Post reverse entry for Stock-Received-But-Not-Billed if it is booked in Purchase Receipt
 				expense_booked_in_pr = frappe.db.get_value('GL Entry', {'is_cancelled': 0,
 					'voucher_type': 'Purchase Receipt', 'voucher_no': item.purchase_receipt, 'voucher_detail_no': item.pr_detail,
 					'account':service_received_but_not_billed_account}, ['name'], as_dict=1)
