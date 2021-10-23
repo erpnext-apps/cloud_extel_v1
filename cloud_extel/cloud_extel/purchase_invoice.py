@@ -20,8 +20,8 @@ def make_purchase_invoice_gl_entries(doc, method):
 					'voucher_type': 'Purchase Receipt', 'voucher_no': item.purchase_receipt, 'voucher_detail_no': item.pr_detail,
 					'account':service_received_but_not_billed_account}, ['name'], as_dict=1)
 
-				account_currency = get_account_currency(expense_booked_in_pr.account)
 				if expense_booked_in_pr:
+					account_currency = get_account_currency(expense_booked_in_pr.account)
 					expense_account = expense_account_map.get(item.pr_detail)
 					amount = flt(item.base_net_amount + item.item_tax_amount, item.precision("base_net_amount"))
 					gl_entries.append(doc.get_gl_dict({
