@@ -1,6 +1,6 @@
 {
 	"cloud_extel/js/cloud_extel.js": [
 		"public/js/dimension_filter.js",
-		"public/js/projects/project_tree.js"
+		"public/js/project_treeview.js"
 	]
 }

@@ -343,7 +343,7 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 
 	get_call_args(filters) {
 		return {
-			method: "erpnext.projects.page.project_tree.project.get_projects_data",
+			method: "cloud_extel.cloud_extel.page.project_treeview.project_treeview.get_projects_data",
 			args: {
 				params: {
 					doctype: "Project",
@@ -359,7 +359,7 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 
 	get_task_call_args(filters) {
 		return {
-			method: "erpnext.projects.page.project_tree.project.get_tasks",
+			method: "cloud_extel.cloud_extel.page.project_treeview.project_treeview.get_tasks",
 			args: {
 				params: {
 					doctype: "Task",
