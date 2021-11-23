@@ -83,7 +83,7 @@ app_include_js = "/assets/cloud_extel/js/cloud_extel.js"
 # ---------------
 # Hook on document methods and events
 
-doc_events = {
+#doc_events = {
 	# "Payment Entry": {
 	# 	"on_submit": "cloud_extel.cloud_extel.deferred_tds.post_tds_gl_entries",
 	# },
@@ -97,10 +97,10 @@ doc_events = {
 	# 	"on_submit": "cloud_extel.cloud_extel.deferred_tds.book_ltds"
 	# }
 
-	"Purchase Invoice": {
-		"on_submit": "cloud_extel.cloud_extel.purchase_invoice.make_purchase_invoice_gl_entries"
-	}
-}
+	# "Purchase Invoice": {
+	# 	"on_submit": "cloud_extel.cloud_extel.purchase_invoice.make_purchase_invoice_gl_entries"
+	# }
+#}
 
 # Scheduled Tasks
 # ---------------
