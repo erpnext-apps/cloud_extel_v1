@@ -22,8 +22,6 @@ app_include_js = "/assets/cloud_extel/js/cloud_extel.js"
 # web_include_css = "/assets/cloud_extel/css/cloud_extel.css"
 # web_include_js = "/assets/cloud_extel/js/cloud_extel.js"
 
-fixtures = ['Custom Field','Client Script', 'Property Setter', 'Print Format', 'Letter Head','Role','Report']
-
 # include js, css files in header of web form
 # webform_include_js = {"doctype": "public/js/doctype.js"}
 # webform_include_css = {"doctype": "public/css/doctype.css"}
