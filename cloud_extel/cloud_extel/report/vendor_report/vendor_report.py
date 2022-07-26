@@ -28,7 +28,7 @@ def get_columns():
 		_("Received Amount") + ":Data:150",
 		_("Pending Amt") + ":Data:150",
 		_("GRN Status") + ":Data:120",
-		_("Purchase Invoice number") + ":Data:120",
+		_("Purchase Invoice number") + "Link/Purchase Order:150",
 		_("Purchase Invoice ERP Date") + ":Date:100",
 		_("Supplier No") + "Link/Supplier:150",
 		_("Supplier Inv Date") + ":Date:100",
@@ -57,6 +57,9 @@ def get_data(filters=None):
 	for purchase_invoice in purchase_invoice_list:
 		is_inclusive_tax = False
 		purchase_invoice_doc = frappe.get_doc("Purchase Invoice",purchase_invoice.name)
+		pe = frappe.get_all('Payment Entry')
+		if len(pe) >=1:
+			payment_entry_doc = frappe.get_doc('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier})
 		# pe = frappe.get_doc("Payment Entry",{'party':purchase_invoice_doc.supplier})
 		for item in purchase_invoice_doc.items:
 			po = frappe.get_doc("Purchase Order", item.purchase_order)
@@ -98,9 +101,14 @@ def get_data(filters=None):
 			tax_amount = get_tax_amount_from_taxes_and_charges(purchase_invoice_doc.name) if purchase_invoice_doc.name else ""
 			due_date = purchase_invoice_doc.due_date if purchase_invoice_doc.due_date else ""
 			payment_status = purchase_invoice_doc.status if purchase_invoice_doc.status else ""
-			pymt_date = ""
-			reference_no = ""
-			company = ""
+			if len(pe) >=1:
+				payment_entry_doc = frappe.get_doc('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier})
+				pymt_date = payment_entry_doc.reference_date if payment_entry_doc else ""
+				reference_no = payment_entry_doc.reference_no if payment_entry_doc else ""
+			else:
+				pymt_date = ""
+				reference_no = ""
+			company = pr.company if pr else ""
 			row = [
 					supplier,
 					cost_centre,
