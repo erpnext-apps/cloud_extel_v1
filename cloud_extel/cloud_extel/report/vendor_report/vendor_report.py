@@ -57,7 +57,7 @@ def get_data(filters=None):
 	for purchase_invoice in purchase_invoice_list:
 		is_inclusive_tax = False
 		purchase_invoice_doc = frappe.get_doc("Purchase Invoice",purchase_invoice.name)
-		pe = frappe.get_all('Payment Entry')
+		pe = frappe.get_all('Payment Entry','party')
 		for item in purchase_invoice_doc.items:
 			if item.purchase_receipt:
 				pr = frappe.get_doc("Purchase Receipt", item.purchase_receipt)
@@ -98,8 +98,10 @@ def get_data(filters=None):
 			due_date = purchase_invoice_doc.due_date if purchase_invoice_doc.due_date else ""
 			payment_status = purchase_invoice_doc.status if purchase_invoice_doc.status else ""
 			if len(pe) >=1:
-				pymt_date = frappe.get_value('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier},'reference_date') or ""
-				reference_no = frappe.get_value('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier},'reference_no') or ""
+				for i in pe:
+					if i['party'] == purchase_invoice_doc.supplier:
+						pymt_date = frappe.db.get_value('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier},'reference_date') or ""
+						reference_no = frappe.db.get_value('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier},'reference_no') or ""
 			else:
 				pymt_date = ""
 				reference_no = ""
