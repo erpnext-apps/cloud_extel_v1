@@ -45,7 +45,7 @@ def get_columns():
 		_("Tax Amount") + ":Data:100",
 		_("Due Date") + ":Date:100",
 		_("Payment Status") + ":Data:180",
-		_("Pymt Date") + ":Date:100",
+		_("Payment Date") + ":Date:100",
 		_("Refernce Number") + ":Data:200",
 		_("Company") + ":Data:200",
 	]	
@@ -58,37 +58,33 @@ def get_data(filters=None):
 		is_inclusive_tax = False
 		purchase_invoice_doc = frappe.get_doc("Purchase Invoice",purchase_invoice.name)
 		pe = frappe.get_all('Payment Entry')
-		if len(pe) >=1:
-			payment_entry_doc = frappe.get_doc('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier})
-		# pe = frappe.get_doc("Payment Entry",{'party':purchase_invoice_doc.supplier})
 		for item in purchase_invoice_doc.items:
-			po = frappe.get_doc("Purchase Order", item.purchase_order)
 			if item.purchase_receipt:
 				pr = frappe.get_doc("Purchase Receipt", item.purchase_receipt)
 			else:
 				pr = ""	
-			supplier = purchase_invoice_doc.supplier if purchase_invoice_doc.supplier else ""
-			cost_centre = purchase_invoice_doc.cost_center if purchase_invoice_doc.cost_center else ""
+			supplier = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'supplier') or ""
+			cost_centre = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'cost_center') or ""
 			telecom_circle = ""
-			po_status = po.status if po else ""
-			date = po.transaction_date if po.transaction_date else ""
-			required_by = po.schedule_date if po.schedule_date else ""
+			po_status = frappe.db.get_value("Purchase Order", item.purchase_order,'status') or ""
+			date = frappe.db.get_value("Purchase Order", item.purchase_order,'transaction_date') or ""
+			required_by = frappe.db.get_value("Purchase Order", item.purchase_order,'schedule_date') or ""
 			purchase_order_number = item.purchase_order if item.purchase_order else ""
-			qty = po.total_qty if po else ""
-			po_amt = po.total if po else ""
+			qty = frappe.db.get_value("Purchase Order", item.purchase_order,'total_qty') or ""
+			po_amt = frappe.db.get_value("Purchase Order", item.purchase_order,'total') or ""
 			grn_no = pr.name if pr else ""
 			grn_dated = pr.posting_date if pr else ""
 			received_qty = pr.total_qty if pr else ""
-			shortage_qty = po.total_qty - pr.total_qty if po and pr else ""
+			shortage_qty = qty - pr.total_qty if pr else ""
 			received_amt = pr.total if pr else ""
-			pending_amt = po.total - pr.total if po and pr else ""
+			pending_amt = po_amt - pr.total if pr else ""
 			grn_status = pr.status if pr else ""
 			purchase_invoice_no = purchase_invoice_doc.name if purchase_invoice_doc.name else ""
 			purchase_invoice_date = purchase_invoice_doc.posting_date if purchase_invoice_doc.posting_date else ""
 			supplier_no = purchase_invoice_doc.bill_no if purchase_invoice_doc.bill_no else ""
 			supplier_invoice_date = purchase_invoice_doc.bill_date if purchase_invoice_doc.bill_date else ""
 			inv_billed_qty = purchase_invoice_doc.total_qty if purchase_invoice_doc.total_qty else ""
-			pending_qty = purchase_invoice_doc.total_qty - po.total_qty if purchase_invoice_doc.total_qty and po else ""
+			pending_qty = purchase_invoice_doc.total_qty - qty if purchase_invoice_doc.total_qty else ""
 			grand_total = purchase_invoice_doc.grand_total if purchase_invoice_doc.grand_total else ""
 			status = purchase_invoice_doc.status if purchase_invoice_doc.status else ""
 			input_sgst = ""
@@ -102,9 +98,8 @@ def get_data(filters=None):
 			due_date = purchase_invoice_doc.due_date if purchase_invoice_doc.due_date else ""
 			payment_status = purchase_invoice_doc.status if purchase_invoice_doc.status else ""
 			if len(pe) >=1:
-				payment_entry_doc = frappe.get_doc('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier})
-				pymt_date = payment_entry_doc.reference_date if payment_entry_doc else ""
-				reference_no = payment_entry_doc.reference_no if payment_entry_doc else ""
+				pymt_date = frappe.get_value('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier},'reference_date') or ""
+				reference_no = frappe.get_value('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier},'reference_no') or ""
 			else:
 				pymt_date = ""
 				reference_no = ""
