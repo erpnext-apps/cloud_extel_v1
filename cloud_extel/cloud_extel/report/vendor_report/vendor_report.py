@@ -102,6 +102,10 @@ def get_data(filters=None):
 					if i['party'] == purchase_invoice_doc.supplier:
 						pymt_date = frappe.db.get_value('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier},'reference_date') or ""
 						reference_no = frappe.db.get_value('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier},'reference_no') or ""
+					else:
+						pymt_date = ""
+						reference_no = ""
+					
 			else:
 				pymt_date = ""
 				reference_no = ""
