@@ -56,99 +56,133 @@ def get_data(filters=None):
 	purchase_invoice_list=frappe.get_all("Purchase Invoice",filters=[['status','!=','Draft']])
 	for purchase_invoice in purchase_invoice_list:
 		is_inclusive_tax = False
-		purchase_invoice_doc = frappe.get_doc("Purchase Invoice",purchase_invoice.name)
-		pe = frappe.get_all('Payment Entry','party')
-		for item in purchase_invoice_doc.items:
-			if item.purchase_receipt:
-				pr = frappe.get_doc("Purchase Receipt", item.purchase_receipt)
-			else:
-				pr = ""	
-			supplier = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'supplier') or ""
-			cost_centre = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'cost_center') or ""
-			telecom_circle = ""
-			po_status = frappe.db.get_value("Purchase Order", item.purchase_order,'status') or ""
-			date = frappe.db.get_value("Purchase Order", item.purchase_order,'transaction_date') or ""
-			required_by = frappe.db.get_value("Purchase Order", item.purchase_order,'schedule_date') or ""
-			purchase_order_number = item.purchase_order if item.purchase_order else ""
-			qty = frappe.db.get_value("Purchase Order", item.purchase_order,'total_qty') or 0
-			po_amt = frappe.db.get_value("Purchase Order", item.purchase_order,'total') or 0
-			grn_no = pr.name if pr else ""
-			grn_dated = pr.posting_date if pr else ""
-			received_qty = pr.total_qty if pr else ""
-			shortage_qty = qty - pr.total_qty if pr else ""
-			received_amt = pr.total if pr else ""
-			pending_amt = po_amt - pr.total if pr else ""
-			grn_status = pr.status if pr else ""
-			purchase_invoice_no = purchase_invoice_doc.name if purchase_invoice_doc.name else ""
-			purchase_invoice_date = purchase_invoice_doc.posting_date if purchase_invoice_doc.posting_date else ""
-			supplier_no = purchase_invoice_doc.bill_no if purchase_invoice_doc.bill_no else ""
-			supplier_invoice_date = purchase_invoice_doc.bill_date if purchase_invoice_doc.bill_date else ""
-			inv_billed_qty = purchase_invoice_doc.total_qty if purchase_invoice_doc.total_qty else ""
-			pending_qty = purchase_invoice_doc.total_qty - qty if purchase_invoice_doc.total_qty else ""
-			grand_total = purchase_invoice_doc.grand_total if purchase_invoice_doc.grand_total else ""
-			status = purchase_invoice_doc.status if purchase_invoice_doc.status else ""
-			input_sgst = ""
-			input_cgst = ""
-			input_igst = ""
-			tds_category = purchase_invoice_doc.tax_withholding_category if purchase_invoice_doc.tax_withholding_category else ""
-			tds_amount	= get_tds_amount_from_purchase_taxes_and_charges(purchase_invoice_doc.name) if purchase_invoice_doc.name else ""
-			tds_name = purchase_invoice_doc.tax_withholding_category if purchase_invoice_doc.tax_withholding_category else ""
-			tsc = ""
-			tax_amount = get_tax_amount_from_taxes_and_charges(purchase_invoice_doc.name) if purchase_invoice_doc.name else ""
-			due_date = purchase_invoice_doc.due_date if purchase_invoice_doc.due_date else ""
-			payment_status = purchase_invoice_doc.status if purchase_invoice_doc.status else ""
-			if len(pe) >=1:
-				for i in pe:
-					if i['party'] == purchase_invoice_doc.supplier:
-						pymt_date = frappe.db.get_value('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier},'reference_date') or ""
-						reference_no = frappe.db.get_value('Payment Entry',{'party_type': 'Supplier','party':purchase_invoice_doc.supplier},'reference_no') or ""
-					else:
-						pymt_date = ""
-						reference_no = ""
-					
-			else:
-				pymt_date = ""
-				reference_no = ""
-			company = pr.company if pr else ""
-			row = [
-					supplier,
-					cost_centre,
-					telecom_circle,
-					po_status,
-					date,
-					required_by,
-					purchase_order_number,
-					qty,
-					po_amt,
-					grn_no,
-					grn_dated,
-					received_qty,
-					shortage_qty,
-					received_amt,
-					pending_amt,
-					grn_status,
-					purchase_invoice_no,
-					purchase_invoice_date,
-					supplier_no,
-					supplier_invoice_date,
-					inv_billed_qty,
-					pending_qty,
-					grand_total,
-					status,
-					input_sgst,
-					input_cgst,
-					input_igst,
-					tds_category,
-					tds_amount,
-					tsc,
-					tax_amount,
-					due_date,
-					payment_status,
-					pymt_date,
-					reference_no,
-					company
-			]
-			data.append(row)
+		supplier = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'supplier') or ""
+		pe = frappe.get_all('Payment Entry','party',{'party_type': 'Supplier','party':supplier})
+		cost_centre = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'cost_center') or ""
+		telecom_circle = ""
+		po_status = frappe.db.sql("select status from `tabPurchase Order` po join `tabPurchase Invoice Item` pii on pii.purchase_order=po.name and pii.parent= %(pi)s",{'pi':purchase_invoice.name},as_dict=1) or ''
+		if po_status:
+			po_status = po_status[0]['status']
+		else:
+			po_status=''
+		date = frappe.db.sql("select transaction_date from `tabPurchase Order` po join `tabPurchase Invoice Item` pii on pii.purchase_order=po.name and pii.parent= %(pi)s",{'pi':purchase_invoice.name},as_dict=1) or ''
+		if date:
+			date = date[0]['transaction_date']
+		else:
+			date=''
+		required_by = frappe.db.sql("select schedule_date from `tabPurchase Order` po join `tabPurchase Invoice Item` pii on pii.purchase_order=po.name and pii.parent= %(pi)s",{'pi':purchase_invoice.name},as_dict=1) or ''
+		if required_by:
+			required_by = required_by[0]['schedule_date']
+		else:
+			required_by=''
+		purchase_order_number = frappe.db.sql("select po.name from `tabPurchase Order` po join `tabPurchase Invoice Item` pii on pii.purchase_order=po.name and pii.parent= %(pi)s",{'pi':purchase_invoice.name},as_dict=1) or ''
+		if purchase_order_number:
+			purchase_order_number = purchase_order_number[0]['name']
+		else:
+			purchase_order_number=''
+		qty = frappe.db.sql("select total_qty from `tabPurchase Order` po join `tabPurchase Invoice Item` pii on pii.purchase_order=po.name and pii.parent= %(pi)s",{'pi':purchase_invoice.name},as_dict=1) or 0
+		if qty:
+			qty = qty[0]['total_qty']
+		else:
+			qty= 0
+		po_amt = frappe.db.sql("select total from `tabPurchase Order` po join `tabPurchase Invoice Item` pii on pii.purchase_order=po.name and pii.parent= %(pi)s",{'pi':purchase_invoice.name},as_dict=1) or 0
+		if po_amt:
+			po_amt = po_amt[0]['total']
+		else:
+			po_amt=0 
+		grn_no = frappe.db.sql("select pr.name from `tabPurchase Receipt` pr join `tabPurchase Invoice Item` pii on pii.purchase_receipt=pr.name and pii.parent= %(pi)s",{'pi':purchase_invoice.name},as_dict=1) or ''
+		if grn_no:
+			grn_no = grn_no[0]['name']
+		else:
+			grn_no=''
+		grn_dated = frappe.db.sql("select pr.posting_date from `tabPurchase Receipt` pr join `tabPurchase Invoice Item` pii on pii.purchase_receipt=pr.name and pii.parent= %(pi)s",{'pi':purchase_invoice.name},as_dict=1) or ''
+		if grn_dated:
+			grn_dated = grn_dated[0]['posting_date']
+		else:
+			grn_dated=''
+		received_qty = frappe.db.sql("select pr.total_qty from `tabPurchase Receipt` pr join `tabPurchase Invoice Item` pii on pii.purchase_receipt=pr.name and pii.parent= %(pi)s",{'pi':purchase_invoice.name},as_dict=1) or ''
+		if received_qty:
+			received_qty = received_qty[0]['total_qty']
+		else:
+			received_qty=0
+		shortage_qty = qty - received_qty or 0
+		received_amt = frappe.db.sql("select pr.total from `tabPurchase Receipt` pr join `tabPurchase Invoice Item` pii on pii.purchase_receipt=pr.name and pii.parent= %(pi)s",{'pi':purchase_invoice.name},as_dict=1) or ''
+		print('RRRRECEIVED AMOUNT',received_amt)
+		if received_amt:
+			received_amt = received_amt[0]['total']
+		else:
+			received_amt=0
+		pending_amt = po_amt - received_amt or ""
+		grn_status = frappe.db.sql("select pr.status from `tabPurchase Receipt` pr join `tabPurchase Invoice Item` pii on pii.purchase_receipt=pr.name and pii.parent= %(pi)s",{'pi':purchase_invoice.name},as_dict=1) or ''
+		if grn_status:
+			grn_status = grn_status[0]['status']
+		else:
+			grn_status=''
+		purchase_invoice_no = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'name') or ""
+		purchase_invoice_date = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'posting_date') or ""
+		supplier_no = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'bill_no') or ""
+		supplier_invoice_date = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'bill_date') or ""
+		inv_billed_qty = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'total_qty') or 0
+		pending_qty = inv_billed_qty - qty or ""
+		grand_total = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'grand_total') or 0
+		status = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'status') or ''
+		tds_category = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'tax_withholding_category') or ''
+		tds_amount	= get_tds_amount_from_purchase_taxes_and_charges(purchase_invoice_no) if purchase_invoice_no else ""
+		tds_name = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'tax_withholding_category') or ''
+		tax_amount = get_tax_amount_from_taxes_and_charges(purchase_invoice_no) if purchase_invoice_no else ""
+		due_date = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'due_date') or ''
+		payment_status = frappe.db.get_value("Purchase Invoice",purchase_invoice.name,'status') or ''
+		if len(pe) >=1:
+			for i in pe:
+				pymt_date = frappe.db.get_value('Payment Entry',{'party_type': 'Supplier','party':supplier},'reference_date') or ""
+				reference_no = frappe.db.get_value('Payment Entry',{'party_type': 'Supplier','party':supplier},'reference_no') or ""
+		else:
+			pymt_date = ""
+			reference_no = ""
+		company = frappe.db.sql("select pr.company from `tabPurchase Receipt` pr join `tabPurchase Invoice Item` pii on pii.purchase_receipt=pr.name and pii.parent= %(pi)s",{'pi':purchase_invoice.name},as_dict=1) or ''
+		if company:
+			company = company[0]['company']
+		else:
+			company=''
+		row = [
+				supplier,
+				cost_centre,
+				telecom_circle,
+				po_status,
+				date,
+				required_by,
+				purchase_order_number,
+				qty,
+				po_amt,
+				grn_no,
+				grn_dated,
+				received_qty,
+				shortage_qty,
+				received_amt,
+				pending_amt,
+				grn_status,
+				purchase_invoice_no,
+				purchase_invoice_date,
+				supplier_no,
+				supplier_invoice_date,
+				inv_billed_qty,
+				pending_qty,
+				grand_total,
+				status,
+				'',
+				'',
+				'',
+				tds_category,
+				tds_amount,
+				'',
+				tax_amount,
+				due_date,
+				payment_status,
+				pymt_date,
+				reference_no,
+				company
+		]
+		data.append(row)
 	return data
 
 def get_tds_amount_from_purchase_taxes_and_charges(purchase_invoice):
