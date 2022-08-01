@@ -53,7 +53,7 @@ def get_columns():
 def get_data(filters=None):
 	print("get_data")
 	data=[]
-	purchase_invoice_list=frappe.get_all("Purchase Invoice")
+	purchase_invoice_list=frappe.get_all("Purchase Invoice",filters=[['status','!=','Draft']])
 	for purchase_invoice in purchase_invoice_list:
 		is_inclusive_tax = False
 		purchase_invoice_doc = frappe.get_doc("Purchase Invoice",purchase_invoice.name)
