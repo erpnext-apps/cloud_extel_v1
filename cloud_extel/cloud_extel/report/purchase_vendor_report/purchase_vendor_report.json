@@ -1,0 +1,33 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2022-08-03 20:09:34.089478",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2022-08-03 20:18:37.200674",
+ "modified_by": "Administrator",
+ "module": "Cloud Extel",
+ "name": "Purchase Vendor Report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT\n    pi.supplier as Supplier,\n    pi.cost_center as CostCentre,\n    po.status as POStatus,\n    po.transaction_date as PODate,\n    po.schedule_date as PORequiredBy,\n    po.name as PurchaseOrderNumber,\n    po.total_qty as POQty,\n    po.total as POAmount,\n    pr.name as GRNNo,\n    pr.posting_date as GRNDate,\n    pr.total_qty as ReceivedQty,\n    (po.total_qty - pr.total_qty) as ShortageQty,\n    pr.total as ReceivedAmount,\n    (po.total - pr.total) as PendingAmt,\n    pr.status as GRNStatus,\n    pi.name as PurchaseInvoiceNumber,\n    pi.posting_date as PurchaseInvoiceERPDate,\n    pi.bill_no as SupplierNo,\n    pi.bill_date as SupplierInvDate,\n    pi.total_qty as InvBilledQty,\n    (pi.total_qty - po.total_qty) as PendingQtytoBill,\n    pi.grand_total as GrandTotal,\n    pi.status as PIStatus,\n    pi.tax_withholding_category as TDSCategory,\n    pit.tax_amount as TaxAmount,\n    pi.due_date as DueDate,\n    pi.status as PaymentStatus,\n    pi.company as Company\nFROM\n    `tabPurchase Order` po\nJOIN \n    `tabPurchase Invoice Item` pii\n    ON pii.purchase_order=po.name\nLEFT JOIN \n    `tabPurchase Invoice` pi\n    ON pi.name = pii.parent\nLEFT JOIN \n    `tabPurchase Taxes and Charges` pit\n    ON pi.name = pit.parent\nLEFT JOIN \n    `tabPurchase Receipt` pr\n    ON pr.name = pii.purchase_receipt\nWHERE\n   pi.status not in ('Cancelled', 'Draft')",
+ "ref_doctype": "Purchase Order",
+ "report_name": "Purchase Vendor Report",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "Stock User"
+  },
+  {
+   "role": "Purchase Manager"
+  },
+  {
+   "role": "Purchase User"
+  }
+ ]
+}
