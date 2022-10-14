@@ -11,7 +11,7 @@ frappe.query_reports["Purchase Vendor Report Extended"] = {
 			fieldname: "to_date",
 			label: __("To Date"),
 			fieldtype: "Date",
-			default: frappe.defaults.get_user_default("year_end_date"),
+			default: frappe.defaults.get_user_default("year_start_date"),
 			reqd: 1
 		},
 		{
